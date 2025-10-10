@@ -41,7 +41,7 @@
   <script>
     document.getElementById("getReports").addEventListener("click", async () => {
       const type = document.getElementById("reportType").value;
-      let url = "http://localhost:3001/api/getReports";
+      let url = "https://report-vandad-backend.vercel.app/api/getReports";
 
       if (type === "daily") url += "?filter=daily";
       if (type === "weekly") url += "?filter=weekly";
@@ -91,3 +91,4 @@
   </script>
 </body>
 </html>
+
