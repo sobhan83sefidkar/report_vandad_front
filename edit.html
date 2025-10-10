@@ -79,7 +79,7 @@
     // پر کردن فرم با داده‌های قبلی
     async function loadReport() {
       try {
-        const res = await fetch(`http://localhost:3001/api/getReport/${reportId}`);
+        const res = await fetch(`https://report-vandad-backend.vercel.app/api/getReport/${reportId}`);
         const report = await res.json();
 
         document.getElementById("reporter").value = report.reporter;
@@ -113,7 +113,7 @@
       };
 
       try {
-        const res = await fetch(`http://localhost:3001/api/editReport/${reportId}`, {
+        const res = await fetch(`https://report-vandad-backend.vercel.app/api/editReport/${reportId}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(updatedData)
@@ -132,3 +132,4 @@
   </script>
 </body>
 </html>
+
