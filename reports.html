@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>گزارش‌ها</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="bg-blue-600 text-white p-4 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-lg font-bold">سیستم گزارش</h1>
+      <ul class="flex gap-6">
+        <li><a href="index.html" class="hover:text-gray-200">ثبت گزارش</a></li>
+        <li><a href="reports.html" class="hover:text-gray-200">گرفتن گزارش</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container mx-auto p-6">
+    <h2 class="text-xl font-bold mb-4">گزارش‌ها</h2>
+
+    <!-- انتخاب نوع گزارش -->
+    <div class="mb-4">
+      <label class="font-medium">نوع گزارش:</label>
+      <select id="reportType" class="border rounded-lg p-2 ml-2">
+        <option value="daily">روزانه</option>
+        <option value="weekly">هفتگی</option>
+        <option value="monthly">ماهانه</option>
+      </select>
+      <button id="getReports" class="bg-blue-600 text-white px-4 py-2 rounded-lg ml-2 hover:bg-blue-700">
+        دریافت
+      </button>
+    </div>
+
+    <!-- نمایش گزارش‌ها -->
+    <div id="reportsList" class="space-y-4"></div>
+  </div>
+
+  <script>
+    document.getElementById("getReports").addEventListener("click", async () => {
+      const type = document.getElementById("reportType").value;
+      let url = "http://localhost:3001/api/getReports";
+
+      if (type === "daily") url += "?filter=daily";
+      if (type === "weekly") url += "?filter=weekly";
+      if (type === "monthly") url += "?filter=monthly";
+
+      try {
+        const res = await fetch(url);
+        const reports = await res.json();
+
+        const container = document.getElementById("reportsList");
+        container.innerHTML = "";
+
+        if (reports.length === 0) {
+          container.innerHTML = `<p class="text-gray-500">گزارشی یافت نشد</p>`;
+          return;
+        }
+
+        reports.forEach(r => {
+          const div = document.createElement("div");
+          div.className = "bg-white shadow p-4 rounded-lg flex justify-between items-center";
+
+          const statusIcon = r.status
+            ? `<span class="text-green-600 font-bold">✔</span>`
+            : `<span class="text-red-600 font-bold">✘</span>`;
+
+          div.innerHTML = `
+            <div>
+              <p><strong>گزارش‌دهنده:</strong> ${r.reporter}</p>
+              <p><strong>مشکل:</strong> ${r.problem}</p>
+              <p><strong>تاریخ:</strong> ${r.date}</p>
+              <p><strong>روز هفته:</strong> ${r.weekday}</p>
+              <p><strong>وضعیت:</strong> ${statusIcon}</p>
+            </div>
+            <div>
+              <a href="edit.html?id=${r._id}" 
+                 class="bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600">
+                 ویرایش
+              </a>
+            </div>
+          `;
+          container.appendChild(div);
+        });
+      } catch (err) {
+        console.error("Error:", err);
+      }
+    });
+  </script>
+</body>
+</html>

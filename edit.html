@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>ویرایش گزارش</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- کتابخانه تاریخ شمسی -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/jquery/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/persian-date/dist/persian-date.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/persian-datepicker/dist/js/persian-datepicker.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+  <!-- Navbar -->
+  <nav class="bg-blue-600 text-white p-4 shadow-lg">
+    <div class="container mx-auto flex justify-between items-center">
+      <h1 class="text-lg font-bold">سیستم گزارش</h1>
+      <ul class="flex gap-6">
+        <li><a href="index.html" class="hover:text-gray-200">ثبت گزارش</a></li>
+        <li><a href="reports.html" class="hover:text-gray-200">گرفتن گزارش</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md mx-auto mt-6">
+    <h2 class="text-xl font-bold mb-4 text-center">ویرایش گزارش</h2>
+    
+    <form id="editForm" class="space-y-4">
+      <!-- گزارش دهنده -->
+      <div>
+        <label class="block mb-1 text-sm font-medium">گزارش دهنده</label>
+        <input type="text" id="reporter" class="w-full border rounded-lg p-2">
+      </div>
+      
+      <!-- مشکل -->
+      <div>
+        <label class="block mb-1 text-sm font-medium">مشکل</label>
+        <textarea id="problem" rows="4" class="w-full border rounded-lg p-2"></textarea>
+      </div>
+      
+      <!-- تاریخ با تقویم شمسی -->
+      <div>
+        <label class="block mb-1 text-sm font-medium">تاریخ</label>
+        <input type="text" id="date" class="w-full border rounded-lg p-2 persian-date">
+      </div>
+      
+      <!-- روز هفته -->
+      <div>
+        <label class="block mb-1 text-sm font-medium">روز هفته</label>
+        <select id="weekday" class="w-full border rounded-lg p-2">
+          <option value="شنبه">شنبه</option>
+          <option value="یکشنبه">یکشنبه</option>
+          <option value="دوشنبه">دوشنبه</option>
+          <option value="سه‌شنبه">سه‌شنبه</option>
+          <option value="چهارشنبه">چهارشنبه</option>
+          <option value="پنجشنبه">پنجشنبه</option>
+        </select>
+      </div>
+
+      <!-- وضعیت مشکل -->
+      <div class="flex items-center gap-2">
+        <input type="checkbox" id="status" class="w-4 h-4">
+        <label for="status" class="text-sm font-medium">وضعیت مشکل (حل شده)</label>
+      </div>
+      
+      <!-- دکمه -->
+      <button type="submit" class="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700">
+        ذخیره تغییرات
+      </button>
+    </form>
+  </div>
+
+  <script>
+    // گرفتن id از URL
+    const params = new URLSearchParams(window.location.search);
+    const reportId = params.get("id");
+
+    // پر کردن فرم با داده‌های قبلی
+    async function loadReport() {
+      try {
+        const res = await fetch(`http://localhost:3001/api/getReport/${reportId}`);
+        const report = await res.json();
+
+        document.getElementById("reporter").value = report.reporter;
+        document.getElementById("problem").value = report.problem;
+        document.getElementById("weekday").value = report.weekday;
+        document.getElementById("status").checked = report.status;
+
+        // مقدار اولیه تاریخ
+        $("#date").pDatepicker({
+          format: "YYYY/MM/DD",
+          autoClose: true,
+          initialValue: true
+        }).setDate(new persianDate().parse(report.date));
+      } catch (err) {
+        console.error("Error loading report:", err);
+      }
+    }
+
+    loadReport();
+
+    // ذخیره تغییرات
+    document.getElementById("editForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const updatedData = {
+        reporter: document.getElementById("reporter").value,
+        problem: document.getElementById("problem").value,
+        date: document.getElementById("date").value,
+        weekday: document.getElementById("weekday").value,
+        status: document.getElementById("status").checked
+      };
+
+      try {
+        const res = await fetch(`http://localhost:3001/api/editReport/${reportId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedData)
+        });
+
+        if (res.ok) {
+          alert("تغییرات ذخیره شد ✅");
+          window.location.href = "reports.html";
+        } else {
+          alert("خطا در ذخیره تغییرات ❌");
+        }
+      } catch (err) {
+        console.error("Error updating report:", err);
+      }
+    });
+  </script>
+</body>
+</html>

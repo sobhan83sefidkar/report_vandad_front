@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <title>فرم گزارش مشکل</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- persian datepicker -->
+    <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/css/persian-datepicker.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-date/dist/persian-date.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/persian-datepicker@1.2.0/dist/js/persian-datepicker.min.js"></script>
+</head>
+
+<body class="bg-gray-100 min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-blue-600 text-white p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-lg font-bold">سیستم گزارش</h1>
+            <ul class="flex gap-6">
+                <li><a href="index.html" class="hover:text-gray-200">ثبت گزارش</a></li>
+                <li><a href="reports.html" class="hover:text-gray-200">گرفتن گزارش</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="bg-white p-6 rounded-2xl shadow-xl w-full max-w-md mx-auto mt-6">
+        <h2 class="text-xl font-bold mb-4 text-center">فرم گزارش مشکل</h2>
+
+        <form id="reportForm" class="space-y-4">
+            <!-- گزارش دهنده -->
+            <div>
+                <label class="block mb-1 text-sm font-medium">گزارش دهنده</label>
+                <input type="text" id="reporter" class="w-full border rounded-lg p-2"
+                    placeholder="نام خود را وارد کنید">
+            </div>
+
+            <!-- مشکل -->
+            <div>
+                <label class="block mb-1 text-sm font-medium">مشکل</label>
+                <textarea id="problem" rows="4" class="w-full border rounded-lg p-2"
+                    placeholder="مشکل را توضیح دهید..."></textarea>
+            </div>
+
+            <!-- تاریخ -->
+            <div>
+                <label class="block mb-1 text-sm font-medium">تاریخ</label>
+                <input type="text" id="date" class="w-full border rounded-lg p-2" placeholder="تاریخ را انتخاب کنید">
+            </div>
+
+            <!-- روز هفته -->
+            <div>
+                <label class="block mb-1 text-sm font-medium">روز هفته</label>
+                <select id="weekday" class="w-full border rounded-lg p-2">
+                    <option value="شنبه">شنبه</option>
+                    <option value="یکشنبه">یکشنبه</option>
+                    <option value="دوشنبه">دوشنبه</option>
+                    <option value="سه‌شنبه">سه‌شنبه</option>
+                    <option value="چهارشنبه">چهارشنبه</option>
+                    <option value="پنجشنبه">پنجشنبه</option>
+                </select>
+            </div>
+
+            <!-- وضعیت مشکل -->
+            <div class="flex items-center gap-2">
+                <input type="checkbox" id="status" class="w-4 h-4">
+                <label for="status" class="text-sm font-medium">وضعیت مشکل</label>
+            </div>
+
+            <!-- دکمه -->
+            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">
+                ارسال گزارش
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // فعال‌سازی تاریخ شمسی
+        $("#date").persianDatepicker({
+            format: 'YYYY/MM/DD',
+            autoClose: true
+        });
+
+        // ارسال دیتا
+        document.getElementById("reportForm").addEventListener("submit", async function (e) {
+            e.preventDefault();
+
+            const data = {
+                reporter: document.getElementById("reporter").value,
+                problem: document.getElementById("problem").value,
+                date: document.getElementById("date").value,
+                weekday: document.getElementById("weekday").value,
+                status: document.getElementById("status").checked  // true یا false
+            };
+
+            console.log("ارسال شد:", data);
+
+            try {
+                const res = await fetch("http://localhost:3001/api/reports", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                alert("گزارش با موفقیت ارسال شد ✅");
+                console.log(result);
+            } catch (err) {
+                alert("خطا در ارسال ❌");
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+
+</html>
