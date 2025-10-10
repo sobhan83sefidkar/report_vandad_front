@@ -98,6 +98,7 @@
         const report = await res.json();
 
         document.getElementById("reporter").value = report.reporter;
+        document.getElementById("company").value = report.company;
         document.getElementById("problem").value = report.problem;
         document.getElementById("weekday").value = report.weekday;
         document.getElementById("status").checked = report.status;
@@ -121,6 +122,7 @@
 
       const updatedData = {
         reporter: document.getElementById("reporter").value,
+        company: document.getElementById("company").value,
         problem: document.getElementById("problem").value,
         date: document.getElementById("date").value,
         weekday: document.getElementById("weekday").value,
@@ -147,5 +149,6 @@
   </script>
 </body>
 </html>
+
 
 
