@@ -98,7 +98,7 @@
             console.log("ارسال شد:", data);
 
             try {
-                const res = await fetch("http://localhost:3001/api/reports", {
+                const res = await fetch("https://report-vandad-backend.vercel.app/api/reports", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(data)
@@ -113,5 +113,6 @@
         });
     </script>
 </body>
+
 
 </html>
