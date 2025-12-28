@@ -64,7 +64,7 @@
       const company = document.getElementById("companySelect").value;
       const timeFilter = document.getElementById("timeFilterSelect").value;
 
-      let url = "http://localhost:3001/api/getReports?";
+      let url = "https://report-vandad-backend.vercel.app/api/getReports?";
       const params = new URLSearchParams();
 
       if (company) params.append("company", company);
@@ -120,3 +120,4 @@
 </body>
 
 </html>
+
