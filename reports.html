@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
+
 <head>
   <meta charset="UTF-8">
   <title>گزارش‌ها</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+
 <body class="bg-gray-100 min-h-screen">
 
   <!-- Navbar -->
@@ -19,19 +21,38 @@
   </nav>
 
   <div class="container mx-auto p-6">
-    <h2 class="text-xl font-bold mb-4">گزارش‌ها</h2>
+    <h2 class="text-xl font-bold mb-4">فیلتر گزارش‌ها</h2>
 
-    <!-- انتخاب نوع گزارش -->
-    <div class="mb-4">
-      <label class="font-medium">نوع گزارش:</label>
-      <select id="reportType" class="border rounded-lg p-2 ml-2">
-        <option value="daily">روزانه</option>
-        <option value="weekly">هفتگی</option>
-        <option value="monthly">ماهانه</option>
-      </select>
-      <button id="getReports" class="bg-blue-600 text-white px-4 py-2 rounded-lg ml-2 hover:bg-blue-700">
-        دریافت
-      </button>
+    <div class=" flex">
+      <!-- انتخاب شرکت -->
+      <div class="mb-4">
+        <label class="font-medium">مجموعه:</label>
+        <select id="companySelect" class="border rounded-lg p-2 ml-2">
+          <option value="">همه</option>
+          <option value="پارت کنترل">پارت کنترل</option>
+          <option value="اکادمی یزدان پور">اکادمی یزدان پور</option>
+          <option value="تولید نور">تولید نور</option>
+          <option value="سیمین الکتریک">سیمین الکتریک</option>
+          <option value="باراد تهویه">باراد تهویه</option>
+          <option value="نگین آسیا">نگین آسیا</option>
+          <option value="بهین خودرو">بهین خودرو</option>
+          <option value="خادم لجستیک">خادم لجستیک</option>
+        </select>
+      </div>
+
+      <!-- انتخاب نوع گزارش -->
+      <div class="mb-4">
+        <label class="font-medium">بازه زمانی:</label>
+        <select id="timeFilterSelect" class="border rounded-lg p-2 ml-2">
+          <option value="">همه</option>
+          <option value="daily">روزانه</option>
+          <option value="weekly">هفتگی</option>
+          <option value="monthly">ماهانه</option>
+        </select>
+        <button id="getReports" class="bg-blue-600 text-white px-4 py-2 rounded-lg ml-2 hover:bg-blue-700">
+          دریافت گزارش‌ها
+        </button>
+      </div>
     </div>
 
     <!-- نمایش گزارش‌ها -->
@@ -40,15 +61,20 @@
 
   <script>
     document.getElementById("getReports").addEventListener("click", async () => {
-      const type = document.getElementById("reportType").value;
-      let url = "https://report-vandad-backend.vercel.app/api/getReports";
+      const company = document.getElementById("companySelect").value;
+      const timeFilter = document.getElementById("timeFilterSelect").value;
 
-      if (type === "daily") url += "?filter=daily";
-      if (type === "weekly") url += "?filter=weekly";
-      if (type === "monthly") url += "?filter=monthly";
+      let url = "http://localhost:3001/api/getReports?";
+      const params = new URLSearchParams();
+
+      if (company) params.append("company", company);
+      if (timeFilter) params.append("timeFilter", timeFilter);
+
+      url += params.toString();
 
       try {
         const res = await fetch(url);
+        if (!res.ok) throw new Error("خطا در دریافت داده‌ها");
         const reports = await res.json();
 
         const container = document.getElementById("reportsList");
@@ -61,19 +87,19 @@
 
         reports.forEach(r => {
           const div = document.createElement("div");
-          div.className = "bg-white shadow p-4 rounded-lg flex justify-between items-center";
+          div.className = "bg-white shadow p-4 rounded-lg flex justify-between items-start";
 
           const statusIcon = r.status
             ? `<span class="text-green-600 font-bold">✔</span>`
             : `<span class="text-red-600 font-bold">✘</span>`;
 
           div.innerHTML = `
-            <div>
-              <p><strong>گزارش‌دهنده:</strong> ${r.reporter}</p>
-              <p><strong>مجموعه:</strong> ${r.company}</p>
-              <p><strong>مشکل:</strong> ${r.problem}</p>
-              <p><strong>تاریخ:</strong> ${r.date}</p>
-              <p><strong>روز هفته:</strong> ${r.weekday}</p>
+            <div class="ml-4">
+              <p><strong>گزارش‌دهنده:</strong> ${r.reporter || "—"} </p>
+              <p><strong>مجموعه:</strong> ${r.company || "—"} </p>
+              <p><strong>مشکل:</strong> ${r.problem || "—"} </p>
+              <p><strong>تاریخ:</strong> ${r.date || "—"} </p>
+              <p><strong>روز هفته:</strong> ${r.weekday || "—"} </p>
               <p><strong>وضعیت:</strong> ${statusIcon}</p>
             </div>
             <div>
@@ -87,10 +113,10 @@
         });
       } catch (err) {
         console.error("Error:", err);
+        document.getElementById("reportsList").innerHTML = `<p class="text-red-500">خطا در دریافت گزارش‌ها: ${err.message}</p>`;
       }
     });
   </script>
 </body>
+
 </html>
-
-
